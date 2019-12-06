@@ -3,12 +3,12 @@
 
 #include <memory>
 
-class Connection;
+template <class T> class Connection;
 class Hive;
-class Listener;
+template <class T> class Listener;
 
+using ConnectionPtr = std::shared<Connection<T>>;
 using HivePtr = std::shared<Hive>;
-using ListenerPtr = std::shared<Listener>;
-using ConnectionPtr = std::shared<Connection>;
+using ListenerPtr = std::shared<Listener<T>>;
 
 #endif // _NET_FORWARD_H
