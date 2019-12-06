@@ -30,7 +30,6 @@ public:
 	void seek(Size);
 	template <class String> void write(const String&);
 	template <class T> void write(T, bool);
-	void write8(Byte); // for ambiguity
 	void write16(uint16, bool); // for ambiguity
 	void write32(uint32, bool); // for ambiguity
 protected:
