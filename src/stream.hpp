@@ -5,7 +5,16 @@
 #include <ostream>
 #include "typedefs.hpp"
 
-class InStream
+class StreamBase
+{
+public:
+	StreamBase(Buffer&);
+	Buffer& getBuffer();
+protected:
+	Buffer &buffer;
+};
+
+class InStream : public StreamBase
 {
 public:
 	InStream(Buffer&);
@@ -16,11 +25,10 @@ public:
 	void seek(Size);
 	void skip(Size);
 protected:
-	Buffer &buffer;
 	std::basic_istream<Byte> internal;
 };
 
-class OutStream
+class OutStream : public StreamBase
 {
 public:
 	OutStream(Buffer&);
@@ -33,7 +41,6 @@ public:
 	void write16(uint16, bool); // for ambiguity
 	void write32(uint32, bool); // for ambiguity
 protected:
-	Buffer &buffer;
 	std::basic_ostream<Byte> internal;
 };
 

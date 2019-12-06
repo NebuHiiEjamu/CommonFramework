@@ -2,8 +2,18 @@
 #include <utility>
 #include "stream.hpp"
 
+StreamBase::StreamBase(Buffer&):
+	buffer(buffer)
+{
+}
+
+Buffer& StreamBase::getBuffer()
+{
+	return buffer;
+}
+
 InStream::InStream(Buffer &buffer):
-	buffer(buffer),
+	StreamBase(buffer),
 	internal(std::basic_istream<Byte>(buffer))
 {
 }
