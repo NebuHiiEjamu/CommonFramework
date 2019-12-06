@@ -80,6 +80,11 @@ template <class T> void OutStream::write(T t, bool reverseEndian = false)
 	internal.write(reinterpret_cast<const Byte*>(&t), sizeof(T));
 }
 
+void OutStream::write8(Byte b)
+{
+	internal.put(b);
+}
+
 void OutStream::write16(uint16 i, bool reverseEndian = false)
 {
 	if (reverseEndian) i = boost::endian::endian_reverse(i);
