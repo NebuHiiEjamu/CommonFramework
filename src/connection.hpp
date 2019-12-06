@@ -26,21 +26,21 @@ public:
 	bool hasError();
 	void disconnect();
 	void receive(Size);
-	void send(const ConstBuffer&);
+	void send(const Buffer&);
 private:
 	void dispatchReceive(Size);
-	void dispatchSend(const ConstBuffer&);
+	void dispatchSend(const Buffer&);
 	void startReceive(Size);
 	void startSend();
 	void handleReceive(Error, Size);
-	void handleSend(Error, const ConstBuffer&);
+	void handleSend(Error, const Buffer&);
 	void startError(Error);
 protected:
 	Connection(HivePtr);
 	virtual void onAccept(std::string_view, uint16);
 	virtual void onConnect(std::string_view, uint16);
-	virtual void onSend(const ConstBuffer&);
-	virtual void onReceive(MutableBuffer&);
+	virtual void onSend(const Buffer&);
+	virtual void onReceive(Buffer&);
 	virtual void onError(Error);
 	virtual void onDisconnect();
 protected:
