@@ -6,7 +6,8 @@
 
 using boost::asio;
 
-Listener::Listener(HivePtr hive):
+template <class T>
+Listener<T>::Listener(HiveRef hive):
 	hive(hive),
 	acceptor(hive->getIOContext()),
 	strand(hive->getIOContext()),
@@ -14,29 +15,34 @@ Listener::Listener(HivePtr hive):
 {
 }
 
-HivePtr Listener::getHive()
+template <class T>
+HiveRef Listener<T>::getHive()
 {
 	return hive;
 }
 
-Acceptor& Listener::getListener()
+template <class T>
+Acceptor& Listener<T>::getListener()
 {
 	return acceptor;
 }
 
-Strand& Listener::getStrand()
+template <class T>
+Strand& Listener<T>::getStrand()
 {
 	return strand;
 }
 
-bool Listener::hasError()
+template <class T>
+bool Listener<T>::hasError()
 {
 	uint32 v1 = 1;
 	uint32 v2 = 1;
 	return errorState.compare_exchange_strong(v1, v2);
 }
 
-void Listener::listen(std::string_view host, uint16 port)
+template <class T>
+void Listener<T>::listen(const std::string_view &host, uint16 port)
 {
 	try
 	{
@@ -54,7 +60,8 @@ void Listener::listen(std::string_view host, uint16 port)
 	}
 }
 
-void Listener::handleAccept(Error error, ConnectionPtr connection)
+template <class T>
+void Listener<T>::handleAccept(Error error, ConnectionPtr<T> connection)
 {
 	if (error || hasError() || hive->stopped())
 		connection->startError(error);
@@ -76,22 +83,26 @@ void Listener::handleAccept(Error error, ConnectionPtr connection)
 	}
 }
 
-void Listener::dispatchAccept(ConnectionPtr connection)
+template <class T>
+void Listener<T>::dispatchAccept(ConnectionPtr<T> connection)
 {
 	acceptor.async_accept(connection->getSocket(), asio::bind_executor(connection->getStrand(),
-		std::bind(&Listener::handleAccept, shared_from_this(), std::placeholders::_1, connection)));
+		std::bind(&Listener<T>::handleAccept, shared_from_this(), std::placeholders::_1, connection)));
 }
 
-void Listener::accept(ConnectionPtr connection)
+template <class T>
+void Listener<T>::accept(ConnectionPtr<T> connection)
 {
-	strand.post(std::bind(&Listener::dispatchAccept, shared_from_this(), connection));
+	strand.post(std::bind(&Listener<T>::dispatchAccept, shared_from_this(), connection));
 }
 
-bool Listener::onAccept(ConnectionPtr, std::string_view, uint16)
+template <class T>
+bool Listener<T>::onAccept(ConnectionRef<T>, const std::string_view&, uint16)
 {
 	return true;
 }
 
-void Listener::onError(Error)
+template <class T>
+void Listener<T>::onError(Error)
 {
 }

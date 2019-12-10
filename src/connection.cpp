@@ -6,7 +6,7 @@
 using boost::asio;
 
 template <class T>
-Connection<T>::Connection(HivePtr hive):
+Connection<T>::Connection(HiveRef hive):
 	hive(hive),
 	socket(hive->getIOContext()),
 	strand(hive->getIOContext()),
@@ -15,7 +15,7 @@ Connection<T>::Connection(HivePtr hive):
 }
 
 template <class T>
-HivePtr Connection<T>::getHive()
+HiveRef Connection<T>::getHive()
 {
 	return hive;
 }
@@ -178,12 +178,12 @@ void Connection<T>::setInBufferSize(Size newSize)
 }
 
 template <class T>
-void Connection<T>::onAccept(std::string_view, uint16)
+void Connection<T>::onAccept(const std::string_view&, uint16)
 {
 }
 
 template <class T>
-void Connection<T>::onConnect(std::string_view, uint16)
+void Connection<T>::onConnect(const std::string_view&, uint16)
 {
 }
 

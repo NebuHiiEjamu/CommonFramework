@@ -15,7 +15,7 @@ public:
 	using Resolver = T::resolver;
 	using Socket = T::socket;
 
-	HivePtr getHive();
+	HiveRef getHive();
 	Strand& getStrand();
 	Socket& getSocket();
 	Address& getAddress() const;
@@ -36,15 +36,15 @@ private:
 	void handleSend(Error, const Buffer&);
 	void startError(Error);
 protected:
-	Connection(HivePtr);
-	virtual void onAccept(std::string_view, uint16);
-	virtual void onConnect(std::string_view, uint16);
+	Connection(HiveRef);
+	virtual void onAccept(const std::string_view&, uint16);
+	virtual void onConnect(const std::string_view&, uint16);
 	virtual void onSend(const Buffer&);
 	virtual void onReceive(Buffer&);
 	virtual void onError(Error);
 	virtual void onDisconnect();
 protected:
-	HivePtr hive;
+	HiveRef hive;
 	Socket socket;
 	Strand strand;
 	Buffer inBuffer;
