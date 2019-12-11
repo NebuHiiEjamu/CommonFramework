@@ -2,18 +2,18 @@
 #include <utility>
 #include "stream.hpp"
 
-StreamBase::StreamBase(Buffer&):
+Stream::Stream(Buffer &buffer):
 	buffer(buffer)
 {
 }
 
-Buffer& StreamBase::getBuffer()
+Buffer& Stream::getBuffer()
 {
 	return buffer;
 }
 
 InStream::InStream(Buffer &buffer):
-	StreamBase(buffer),
+	Stream(buffer),
 	internal(std::basic_istream<Byte>(buffer))
 {
 }
@@ -54,7 +54,7 @@ void InStream::skip(Size bytes)
 }
 
 OutStream::OutStream(Buffer &buffer):
-	buffer(buffer),
+	Stream(buffer),
 	internal(std::basic_ostream<Byte>(buffer))
 {
 }

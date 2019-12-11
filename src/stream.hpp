@@ -5,16 +5,16 @@
 #include <ostream>
 #include "typedefs.hpp"
 
-class StreamBase
+class Stream
 {
 public:
-	StreamBase(Buffer&);
+	Stream(Buffer&);
 	Buffer& getBuffer();
 protected:
 	Buffer &buffer;
 };
 
-class InStream : public StreamBase
+class InStream : public Stream
 {
 public:
 	InStream(Buffer&);
@@ -28,7 +28,7 @@ protected:
 	std::basic_istream<Byte> internal;
 };
 
-class OutStream : public StreamBase
+class OutStream : public Stream
 {
 public:
 	OutStream(Buffer&);
