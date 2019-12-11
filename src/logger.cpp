@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <fmt/core.h>
+#include <iostream>
 
 #include "logger.hpp"
 
@@ -19,7 +20,7 @@ void dumpStack(int signal)
 	std::raise(SIGABRT);
 }
 
-Logger::Logger(std::ostream &stream, LogLevel level):
+Logger::Logger(std::ostream &stream = std::cout, LogLevel level = LogLevel::debug):
 	stream(stream),
 	level(level)
 {

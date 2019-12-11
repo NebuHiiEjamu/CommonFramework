@@ -7,11 +7,15 @@
 class Server : public std::enable_shared_from_this<Server>
 {
 public:
-	Server(LoggerPtr);
+	HiveRef getHive();
 	LoggerRef getLogger();
 	LogLevel getLogLevel() const;
+	void setLogger(LoggerPtr);
 	virtual void run(int, char**) = 0;
 protected:
+	Server();
+protected:
+	HivePtr hive;
 	LoggerPtr logger;
 };
 
