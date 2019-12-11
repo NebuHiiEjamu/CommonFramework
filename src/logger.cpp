@@ -40,7 +40,7 @@ void Logger::debug(const std::string_view &text)
 	if (level >= LogLevel::debug)
 	{
 		std::time_t time = std::time(nullptr);
-		stream << fmt::format("\x1B[96m[DEBUG] {:%F %T}: {}\033[0m", text);
+		stream << fmt::format("\x1B[96m[DEBUG] {:%F %T}: {}\033[0m", text) << std::endl;
 	}
 }
 
@@ -52,7 +52,7 @@ template <typename Args...> void Logger::debug(const std::string_view& text, con
 void Logger::error(const std::string_view &text)
 {
 	if (level >= LogLevel::error)
-		stream << fmt::format("\x1B[91m[ERROR] {:%F %T}: {}\033[0m", text);
+		stream << fmt::format("\x1B[91m[ERROR] {:%F %T}: {}\033[0m", text) << std::endl;
 }
 
 template <typename Args...> void Logger::error(const std::string_view& text, const Args&... args)
@@ -63,7 +63,7 @@ template <typename Args...> void Logger::error(const std::string_view& text, con
 void Logger::fatal(const std::string_view&)
 {
 	if (level >= LogLevel::fatal)
-		stream << fmt::format("\x1B[91m[FATAL] {:%F %T}: {}\033[0m", text);
+		stream << fmt::format("\x1B[91m[FATAL] {:%F %T}: {}\033[0m", text) << std::endl;
 }
 
 template <typename Args...> void Logger::fatal(const std::string_view &text, const Args&... args)
@@ -73,7 +73,7 @@ template <typename Args...> void Logger::fatal(const std::string_view &text, con
 
 void Logger::info(const std::string_view &text)
 {
-	if (level >= LogLevel::info) stream << fmt::format("{:%F %T}: {}", text);
+	if (level >= LogLevel::info) stream << fmt::format("{:%F %T}: {}", text) << std::endl;
 }
 
 template <typename Args...> void Logger::info(const std::string_view& text, const Args&... args)
@@ -84,7 +84,7 @@ template <typename Args...> void Logger::info(const std::string_view& text, cons
 void Logger::trace(const std::string_view &text)
 {
 	if (level >= LogLevel::trace)
-		stream << fmt::format("\x1B[96m[TRACE] {:%F %T}: {}\033[0m", text);
+		stream << fmt::format("\x1B[96m[TRACE] {:%F %T}: {}\033[0m", text) << std::endl;
 }
 
 template <typename Args...> void Logger::trace(const std::string_view& text, const Args&... args)
@@ -95,7 +95,7 @@ template <typename Args...> void Logger::trace(const std::string_view& text, con
 void Logger::warn(const std::string_view &text)
 {
 	if (level >= LogLevel::warn)
-		stream << fmt::format("\x1B[93m[WARN] {:%F %T}: {}\033[0m", text);
+		stream << fmt::format("\x1B[93m[WARN] {:%F %T}: {}\033[0m", text) << std::endl;
 }
 
 template <typename Args...> void Logger::warn(const std::string_view& text, const Args&... args)

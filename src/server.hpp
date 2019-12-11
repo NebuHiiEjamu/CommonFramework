@@ -9,6 +9,7 @@ class Server : public std::enable_shared_from_this<Server>
 public:
 	Server(LoggerPtr);
 	LoggerRef getLogger();
+	LogLevel getLogLevel() const;
 	virtual void run(int, char**) = 0;
 protected:
 	LoggerPtr logger;
