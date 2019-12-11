@@ -4,16 +4,26 @@
 #include <memory>
 #include <ostream>
 #include <string_view>
-#include "typedefs.h"
+#include "typedefs.hpp"
 
 extern "C" void dumpStack(int);
+
+enum class LogLevel : Byte
+{
+	fatal,
+	error,
+	warn,
+	info,
+	trace,
+	debug
+};
 
 class Logger : public std::enable_shared_from_this<Logger>
 {
 public:
-	Logger(std::ostream&, Byte);
-	Byte getLevel() const;
-	void setLevel(Byte);
+	Logger(std::ostream&, LogLevel);
+	LogLevel getLevel() const;
+	void setLevel(LogLevel);
 	void debug(const std::string_view&);
 	template <typename Args...> void debug(const std::string_view&, const Args&...);
 	void error(const std::string_view&);
@@ -28,7 +38,7 @@ public:
 	template <typename Args...> void warn(const std::string_view&, const Args&...);
 private:
 	std::ostream &stream;
-	Byte level;
+	LogLevel level;
 };
 
 #endif // _LOGGER_H

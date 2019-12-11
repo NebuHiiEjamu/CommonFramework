@@ -19,79 +19,86 @@ void dumpStack(int signal)
 	std::raise(SIGABRT);
 }
 
-Logger::Logger(std::ostream &stream, Byte level):
+Logger::Logger(std::ostream &stream, LogLevel level):
 	stream(stream),
 	level(level)
 {
 }
 
-Byte Logger::getLevel() const
+LogLevel Logger::getLevel() const
 {
 	return level;
 }
 
-void Logger::setLevel(Byte b)
+void Logger::setLevel(LogLevel ll)
 {
-	level = b;
+	level = ll;
 }
 
 void Logger::debug(const std::string_view &text)
 {
-	std::time_t time = std::time(nullptr);
-	stream << fmt::format("\x1B[96m[DEBUG] {:%F %T}: {}\033[0m", text);
+	if (level >= LogLevel::debug)
+	{
+		std::time_t time = std::time(nullptr);
+		stream << fmt::format("\x1B[96m[DEBUG] {:%F %T}: {}\033[0m", text);
+	}
 }
 
 template <typename Args...> void Logger::debug(const std::string_view& text, const Args&... args)
 {
-	debug(fmt::format(text, args...));
+	if (level >= LogLevel::debug) debug(fmt::format(text, args...));
 }
 
 void Logger::error(const std::string_view &text)
 {
-	stream << fmt::format("\x1B[91m[ERROR] {:%F %T}: {}\033[0m", text);
+	if (level >= LogLevel::error)
+		stream << fmt::format("\x1B[91m[ERROR] {:%F %T}: {}\033[0m", text);
 }
 
 template <typename Args...> void Logger::error(const std::string_view& text, const Args&... args)
 {
-	error(fmt::format(text, args...));
+	if (level >= LogLevel::error) error(fmt::format(text, args...));
 }
 
 void Logger::fatal(const std::string_view&)
 {
-	stream << fmt::format("\x1B[91m[FATAL] {:%F %T}: {}\033[0m", text);
+	if (level >= LogLevel::fatal)
+		stream << fmt::format("\x1B[91m[FATAL] {:%F %T}: {}\033[0m", text);
 }
 
-template <typename Args...> void Logger::fatal(const std::string_view& text, const Args&... args)
+template <typename Args...> void Logger::fatal(const std::string_view &text, const Args&... args)
 {
-	fatal(fmt::format(text, args...));
+	if (level >= LogLevel::fatal) fatal(fmt::format(text, args...));
 }
 
-void Logger::info(const std::string_view&)
+void Logger::info(const std::string_view &text)
 {
-	stream << fmt::format("{:%F %T}: {}", text);
+	if (level >= LogLevel::info) stream << fmt::format("{:%F %T}: {}", text);
 }
 
 template <typename Args...> void Logger::info(const std::string_view& text, const Args&... args)
 {
-	info(fmt::format(text, args...));
+	if (level >= LogLevel::info) info(fmt::format(text, args...));
 }
 
-void Logger::trace(const std::string_view&)
+void Logger::trace(const std::string_view &text)
 {
-	stream << fmt::format("\x1B[96m[TRACE] {:%F %T}: {}\033[0m", text);
+	if (level >= LogLevel::trace)
+		stream << fmt::format("\x1B[96m[TRACE] {:%F %T}: {}\033[0m", text);
 }
 
 template <typename Args...> void Logger::trace(const std::string_view& text, const Args&... args)
 {
-	trace(fmt::format(text, args...));
+	if (level >= LogLevel::trace) trace(fmt::format(text, args...));
 }
 
-void Logger::warn(const std::string_view&)
+void Logger::warn(const std::string_view &text)
 {
-	stream << fmt::format("\x1B[93m[WARN] {:%F %T}: {}\033[0m", text);
+	if (level >= LogLevel::warn)
+		stream << fmt::format("\x1B[93m[WARN] {:%F %T}: {}\033[0m", text);
 }
 
 template <typename Args...> void Logger::warn(const std::string_view& text, const Args&... args)
 {
-	warn(fmt::format(text, args...));
+	if (level >= LogLevel::warn) warn(fmt::format(text, args...));
 }
