@@ -52,6 +52,12 @@ uint16 Connection<T>::getPort() const
 }
 
 template <class T>
+uint32 Connection<T>::getErrorState() const
+{
+	return errorState;
+}
+
+template <class T>
 bool Connection<T>::hasError()
 {
 	uint32 v1 = 1;

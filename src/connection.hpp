@@ -20,6 +20,7 @@ public:
 	Address& getAddress() const;
 	std::string getHostName() const;
 	uint16 getPort() const;
+	uint32 getErrorState() const;
 	Size getInBufferSize() const;
 	void setInBufferSize(Size);
 	bool hasError();
