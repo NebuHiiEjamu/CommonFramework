@@ -10,6 +10,7 @@ Connection<T>::Connection(HiveRef hive):
 	hive(hive),
 	socket(hive->getIOContext()),
 	strand(hive->getIOContext()),
+	resolver(hive->getIOContext()),
 	errorState(0)
 {
 }
@@ -41,7 +42,6 @@ Address& Connection<T>::getAddress() const
 template <class T>
 std::string Connection<T>::getHostName() const
 {
-	Resolver resolver(hive->getService());
 	return resolver.resolve(getAddress(), std::to_string(getPort()))->host_name();
 }
 
@@ -154,6 +154,21 @@ void Connection<T>::handleSend(Error error, const Buffer &buffer)
 }
 
 template <class T>
+void Connection<T>::handleConnect(Error error)
+{
+	if (error || hasError() || hive->stopped()) startError(error);
+	else
+	{
+		if (socket.is_open())
+		{
+			onConnect(getAddress().to_string(), getPort());
+			receive();
+		}
+		else startError(error);
+	}
+}
+
+template <class T>
 void Connection<T>::receive(Size totalBytes = 0)
 {
 	strand.post(std::bind(&Connection<T>::dispatchReceive, shared_from_this(), totalBytes));
@@ -163,6 +178,15 @@ template <class T>
 void Connection<T>::send(const Buffer &buffer)
 {
 	strand.post(std::bind(&Connection<T>::dispatchSend, shared_from_this(), buffer));
+}
+
+template <class T>
+void Connection<T>::connect(const std::string_view &host, uint16 port)
+{
+	Resolver::iterator it = resolver.resolve(host, std::to_string(port));
+	
+	socket.async_connect(*it, asio::bind_executor(strand, std::bind(&Connection<T>::handleConnect,
+		shared_from_this(), std::placeholders::_1)));
 }
 
 template <class T>
