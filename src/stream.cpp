@@ -47,6 +47,13 @@ InStream::InStream(ByteString &input):
 {
 }
 
+Byte InStream::read()
+{
+	Byte b = data.at(positionN);
+	seek(1);
+	return b;
+}
+
 template <class String> String&& InStream::read(Size bytes)
 {
 	String str(positionI, positionI + bytes);
@@ -73,7 +80,7 @@ void OutStream::pad(Size bytes)
 	seek(bytes);
 }
 
-template <class String> void OutStream::write(const String &s)
+template <class String> void OutStream::writeString(const String &s)
 {
 	data.insert(std::back_inserter(data), s.begin(), s.end());
 }
