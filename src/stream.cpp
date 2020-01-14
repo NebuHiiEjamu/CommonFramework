@@ -1,103 +1,111 @@
+#include <algorithm>
 #include <boost/endian/conversion.hpp>
+#include <iterator>
 #include <utility>
+
 #include "stream.hpp"
 
-Stream::Stream(Buffer &buffer):
-	buffer(buffer)
+Stream::Stream():
+	positionI(data.begin()),
+	positionN(0)
 {
 }
 
-Buffer& Stream::getBuffer()
+void Stream::flush()
 {
-	return buffer;
+	data.clear();
 }
 
-InStream::InStream(Buffer &buffer):
-	Stream(buffer),
-	internal(std::basic_istream<Byte>(buffer))
+ByteString& Stream::get()
 {
+	return data;
 }
 
-Size InStream::getPosition() const
+Byte Stream::peek() const
 {
-	return internal.tellg();
+	return data.at(positionN);
 }
 
-Byte InStream::peek()
+void Stream::seek(long pos, bool beginEnd = false)
 {
-	return internal.peek();
+	if (beginEnd && pos < 0)
+		positionN = data.size() + pos;
+	else if (beginEnd && pos >= 0)
+		positionN = pos;
+	else
+		positionN += pos;
+	positionI = data.begin() + positionN;
+}
+
+Size Stream::tell() const
+{
+	return positionN;
+}
+
+InStream::InStream(ByteString &input):
+	data(input)
+{
 }
 
 template <class String> String&& InStream::read(Size bytes)
 {
-	String data(bytes, 0);
-	internal.read(reinterpret_cast<Byte*>(data.data()), bytes);
-	return std::move(bytes);
+	String str(positionI, positionI + bytes);
+	seek(bytes);
+	return std::move(str);
 }
 
 template <class T> T InStream::read(bool reverseEndian = false)
 {
 	T t;
-	internal.read(reinterpret_cast<Byte*>(&t), sizeof(T));
+	std::copy(position, position + sizeof(T), reinterpret_cast<T*>(&t));
 	if (reverseEndian) t = boost::endian::endian_reverse(t);
+	seek(sizeof(T));
 	return t;
 }
 
-void InStream::seek(Size position)
+OutStream::OutStream()
 {
-	internal.seekg(position);
-}
-
-void InStream::skip(Size bytes)
-{
-	internal.ignore(bytes);
-}
-
-OutStream::OutStream(Buffer &buffer):
-	Stream(buffer),
-	internal(std::basic_ostream<Byte>(buffer))
-{
-}
-
-void OutStream::flush()
-{
-	internal.flush();
-}
-
-Size OutStream::getPosition() const
-{
-	return internal.tellp();
 }
 
 void OutStream::pad(Size bytes)
 {
-	for (Size i = 0; i < bytes; i++) internal.put(0);
-}
-
-void OutStream::seek(Size position)
-{
-	internal.seekp(position);
+	for (Size i = 0; i < bytes; i++) data.push_back(0);
+	seek(bytes);
 }
 
 template <class String> void OutStream::write(const String &s)
 {
-	internal.write(reinterpret_cast<const Byte*>(&s[0]), s.size());
+	data.insert(std::back_inserter(data), s.begin(), s.end());
 }
 
 template <class T> void OutStream::write(T t, bool reverseEndian = false)
 {
 	if (reverseEndian) t = boost::endian::endian_reverse(t);
-	internal.write(reinterpret_cast<const Byte*>(&t), sizeof(T));
+	for (int i = sizeof(T) - 1; i >= 0; i--)
+		data.push_back(static_cast<Byte>((t & (0xFF << (i * 8))) >> (i * 8)));
+	seek(sizeof(T));
+}
+
+void OutStream::write8(Byte b)
+{
+	data.push_back(b);
+	seek(1);
 }
 
 void OutStream::write16(uint16 i, bool reverseEndian = false)
 {
 	if (reverseEndian) i = boost::endian::endian_reverse(i);
-	internal.write(reinterpret_cast<const Byte*>(&i), sizeof(uint16));
+	data.push_back(static_cast<Byte>((i & 0xFF00) >> 8);
+	data.push_back(static_cast<Byte>(i & 0xFF);
+	seek(2);
 }
 
 void OutStream::write32(uint32 i, bool reverseEndian = false)
 {
 	if (reverseEndian) i = boost::endian::endian_reverse(i);
-	internal.write(reinterpret_cast<const Byte*>(&i), sizeof(uint32));
+	data.push_back(static_cast<Byte>((i & 0xFF000000) >> 24);
+	data.push_back(static_cast<Byte>((i & 0xFF0000) >> 16);
+	data.push_back(static_cast<Byte>((i & 0xFF00) >> 8);
+	data.push_back(static_cast<Byte>(i & 0xFF);
+	seek(4);
 }

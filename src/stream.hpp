@@ -1,47 +1,41 @@
 #ifndef _STREAM_H
 #define _STREAM_H
 
-#include <istream>
-#include <ostream>
 #include "typedefs.hpp"
 
 class Stream
 {
 public:
-	Stream(Buffer&);
-	Buffer& getBuffer();
+	Stream();
+	void flush();
+	ByteString& get();
+	Byte peek() const;
+	void seek(int, bool);
+	Size tell() const;
 protected:
-	Buffer &buffer;
+	ByteString data;
+	ByteString::iterator positionI;
+	Size positionN;
 };
 
 class InStream : public Stream
 {
 public:
-	InStream(Buffer&);
-	Size getPosition() const;
-	Byte peek();
+	InStream(ByteString&);
 	template <class String> String&& read(Size);
 	template <class T> T read(bool);
-	void seek(Size);
-	void skip(Size);
-protected:
-	std::basic_istream<Byte> internal;
 };
 
 class OutStream : public Stream
 {
 public:
-	OutStream(Buffer&);
-	void flush();
-	Size getPosition() const;
+	OutStream();
 	void pad(Size);
-	void seek(Size);
 	template <class String> void write(const String&);
 	template <class T> void write(T, bool);
-	void write16(uint16, bool); // for ambiguity
-	void write32(uint32, bool); // for ambiguity
-protected:
-	std::basic_ostream<Byte> internal;
+	void write8(uint16); // for ambiguity
+	virtual void write16(uint16, bool); // for ambiguity
+	virtual void write32(uint32, bool); // for ambiguity
 };
 
 #endif // _STREAM_H
