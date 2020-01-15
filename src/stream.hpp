@@ -33,6 +33,7 @@ public:
 	OutStream();
 	void pad(Size);
 	template <class String> void writeString(const String&);
+	void writeString(const char*);
 	template <class T> void write(T, bool);
 	void write8(Byte); // for ambiguity
 	virtual void write16(uint16, bool); // for ambiguity

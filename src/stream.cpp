@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <boost/endian/conversion.hpp>
+#include <cstring>
 #include <iterator>
 #include <utility>
 
@@ -83,6 +84,14 @@ void OutStream::pad(Size bytes)
 template <class String> void OutStream::writeString(const String &s)
 {
 	data.insert(std::back_inserter(data), s.begin(), s.end());
+	seek(s.size());
+}
+
+void OutStream::writeString(const char *s)
+{
+	Size len = std::strlen(s);
+	data.insert(std::back_inserter(data), s, s + len);
+	seek(len);
 }
 
 template <class T> void OutStream::write(T t, bool reverseEndian = false)
