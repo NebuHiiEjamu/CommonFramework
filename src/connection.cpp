@@ -96,10 +96,10 @@ void Connection<T>::dispatchReceive(Size totalBytes)
 }
 
 template <class T>
-void Connection<T>::dispatchSend(const ByteString &data)
+void Connection<T>::dispatchSend(const Buffer &buffer)
 {
 	bool shouldStartSend = pendingSends.empty();
-	pendingSends.push(data);
+	pendingSends.push(buffer);
 	if (shouldStartSend) startSend();
 }
 
@@ -108,15 +108,16 @@ void Connection<T>::startReceive(Size totalBytes)
 {
 	if (totalBytes > 0)
 	{
-		asio::async_read(socket, asio::dynamic_buffer(inBuffer, totalBytes),
-			asio::bind_executor(strand, std::bind(&Connection<T>::handleReceive, shared_from_this(),
-			std::placeholders::_1, std::placeholders::_2)));
+		asio::async_read(socket, inBuffer.prepare(totalBytes), asio::bind_executor(strand,
+			std::bind(&Connection<T>::handleReceive, shared_from_this(), std::placeholders::_1,
+				std::placeholders::_2)));
 	}
 	else
 	{
-		socket.async_read_some(asio::dynamic_buffer(inBuffer, inBufferSize),
-			asio::bind_executor(strand, std::bind(&Connection<T>::handleReceive, shared_from_this(),
-				std::placeholders::_1, std::placeholders::_2)));
+		MutableBuffer buffer = inBuffer.prepare(inBufferSize);
+		asio::async_read_some(socket, inBuffer.prepare(inBufferSize), asio::bind_executor(strand,
+			std::bind(&Connection<T>::handleReceive, shared_from_this(), std::placeholders::_1,
+				std::placeholders::_2)));
 	}
 }
 
@@ -125,7 +126,8 @@ void Connection<T>::startSend()
 {
 	if (!pendingSends.empty())
 	{
-		asio::async_write(socket, asio::buffer(pendingSends.front())), asio::bind_executor(strand,
+		Buffer &front = pendingSends.front()
+		asio::async_write(socket, front.data()), asio::bind_executor(strand,
 			std::bind(&Connection<T>::handleSend, shared_from_this(), std::placeholders::_1,
 			pendingSends.front())));
 	}
@@ -137,6 +139,7 @@ void Connection<T>::handleReceive(Error error, Size receivedBytes)
 	if (error || hasError() || hive->stopped()) startError(error);
 	else
 	{
+		inBuffer.resize(receivedBytes);
 		onReceive(inBuffer);
 		receive();
 		pendingReceives.pop();
@@ -145,12 +148,12 @@ void Connection<T>::handleReceive(Error error, Size receivedBytes)
 }
 
 template <class T>
-void Connection<T>::handleSend(Error error, const ByteString &data)
+void Connection<T>::handleSend(Error error, const Buffer &buffer)
 {
 	if (error || hasError() || hive->stopped()) startError(error);
 	else
 	{
-		onSend(data);
+		onSend(buffer);
 		pendingSends.pop();
 		startSend();
 	}
@@ -178,9 +181,9 @@ void Connection<T>::receive(Size totalBytes = 0)
 }
 
 template <class T>
-void Connection<T>::send(const ByteString &data)
+void Connection<T>::send(const Buffer &buffer)
 {
-	strand.post(std::bind(&Connection<T>::dispatchSend, shared_from_this(), data));
+	strand.post(std::bind(&Connection<T>::dispatchSend, shared_from_this(), buffer));
 }
 
 template <class T>
@@ -215,12 +218,12 @@ void Connection<T>::onConnect(const std::string_view&, uint16)
 }
 
 template <class T>
-void Connection<T>::onSend(const ByteString&)
+void Connection<T>::onSend(const Buffer&)
 {
 }
 
 template <class T>
-void Connection<T>::onReceive(ByteString&)
+void Connection<T>::onReceive(Buffer&)
 {
 }
 
