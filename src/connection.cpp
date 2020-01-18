@@ -96,10 +96,10 @@ void Connection<T>::dispatchReceive(Size totalBytes)
 }
 
 template <class T>
-void Connection<T>::dispatchSend(const Buffer &buffer)
+void Connection<T>::dispatchSend(const ByteString &data)
 {
 	bool shouldStartSend = pendingSends.empty();
-	pendingSends.push(buffer);
+	pendingSends.push(data);
 	if (shouldStartSend) startSend();
 }
 
@@ -108,14 +108,15 @@ void Connection<T>::startReceive(Size totalBytes)
 {
 	if (totalBytes > 0)
 	{
-		asio::async_read(socket, inBuffer.prepare(totalBytes), asio::bind_executor(strand,
+		inBuffer.resize(totalBytes);
+		asio::async_read(socket, asio::dynamic_buffer(inBuffer), asio::bind_executor(strand,
 			std::bind(&Connection<T>::handleReceive, shared_from_this(), std::placeholders::_1,
 				std::placeholders::_2)));
 	}
 	else
 	{
-		MutableBuffer buffer = inBuffer.prepare(inBufferSize);
-		asio::async_read_some(socket, inBuffer.prepare(inBufferSize), asio::bind_executor(strand,
+		inBuffer.resize(inBufferSize);
+		socket.async_read_some(asio::dynamic_buffer(inBuffer), asio::bind_executor(strand,
 			std::bind(&Connection<T>::handleReceive, shared_from_this(), std::placeholders::_1,
 				std::placeholders::_2)));
 	}
@@ -126,8 +127,8 @@ void Connection<T>::startSend()
 {
 	if (!pendingSends.empty())
 	{
-		Buffer &front = pendingSends.front()
-		asio::async_write(socket, front.data()), asio::bind_executor(strand,
+		ByteString &front = pendingSends.front();
+		asio::async_write(socket, asio::dynamic_buffer(front), asio::bind_executor(strand,
 			std::bind(&Connection<T>::handleSend, shared_from_this(), std::placeholders::_1,
 			pendingSends.front())));
 	}
@@ -181,9 +182,9 @@ void Connection<T>::receive(Size totalBytes = 0)
 }
 
 template <class T>
-void Connection<T>::send(const Buffer &buffer)
+void Connection<T>::send(const ByteString &data)
 {
-	strand.post(std::bind(&Connection<T>::dispatchSend, shared_from_this(), buffer));
+	strand.post(std::bind(&Connection<T>::dispatchSend, shared_from_this(), data));
 }
 
 template <class T>
@@ -218,12 +219,12 @@ void Connection<T>::onConnect(const std::string_view&, uint16)
 }
 
 template <class T>
-void Connection<T>::onSend(const Buffer&)
+void Connection<T>::onSend(const ByteString&)
 {
 }
 
 template <class T>
-void Connection<T>::onReceive(Buffer&)
+void Connection<T>::onReceive(ByteString&)
 {
 }
 

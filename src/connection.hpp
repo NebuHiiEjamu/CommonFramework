@@ -8,7 +8,8 @@
 #include "forward.hpp"
 #include "typedefs.hpp"
 
-template <class T> class Connection : public std::enable_shared_from_this<Connection<T>>
+template <class T>
+class Connection : public std::enable_shared_from_this<Connection<T>>
 {
 public:
 	using Resolver = T::resolver;
@@ -26,15 +27,15 @@ public:
 	bool hasError();
 	void disconnect();
 	void receive(Size);
-	void send(const Buffer&);
+	void send(const ByteString&);
 	void connect(const std::string_view&, uint16);
 private:
 	void dispatchReceive(Size);
-	void dispatchSend(const Buffer&);
+	void dispatchSend(const ByteString&);
 	void startReceive(Size);
 	void startSend();
 	void handleReceive(Error, Size);
-	void handleSend(Error, const Buffer&);
+	void handleSend(Error, const ByteString&);
 	void handleConnect(Error);
 	void startError(Error);
 protected:
@@ -49,11 +50,11 @@ protected:
 	HiveRef hive;
 	Socket socket;
 	Strand strand;
-	Buffer inBuffer;
+	ByteString inBuffer;
 	Resolver resolver;
 	std::atomic_uint32_t errorState;
 	std::queue<Size> pendingReceives;
-	std::queue<Buffer> pendingSends;
+	std::queue<ByteString> pendingSends;
 	Size inBufferSize;
 };
 

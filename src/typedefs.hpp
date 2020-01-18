@@ -12,15 +12,12 @@
 
 using Address = boost::asio::ip::address;
 using Byte = std::uint8_t;
-using Buffer = boost::asio::streambuf<std::allocator<Byte>>
 using ByteString = std::vector<Byte>;
-using ConstBuffer = Buffer::const_buffers_type;
 using Error = boost::asio::error_code;
 using FilePath = std::filesystem::path;
 using int16 = std::int16_t;
 using int32 = std::int32_t;
 using LockGuard = std::lock_guard<std::mutex>;
-using MutableBuffer = Buffer::mutable_buffers_type;
 using sint16 = boost::numeric::safe<int16>;
 using sint32 = boost::numeric::safe<int32>;
 using Size = std::size_t;
