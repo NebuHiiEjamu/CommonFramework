@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <queue>
+#include <string>
 #include <string_view>
 
 #include "forward.hpp"
@@ -27,34 +28,34 @@ public:
 	bool hasError();
 	void disconnect();
 	void receive(Size);
-	void send(const ByteString&);
+	void send(const std::string&);
 	void connect(const std::string_view&, uint16);
 private:
 	void dispatchReceive(Size);
-	void dispatchSend(const ByteString&);
+	void dispatchSend(const std::string&);
 	void startReceive(Size);
 	void startSend();
 	void handleReceive(Error, Size);
-	void handleSend(Error, const ByteString&);
+	void handleSend(Error, const std::string&);
 	void handleConnect(Error);
 	void startError(Error);
 protected:
 	Connection(HiveRef);
 	virtual void onAccept(const std::string_view&, uint16);
 	virtual void onConnect(const std::string_view&, uint16);
-	virtual void onSend(const Buffer&);
-	virtual void onReceive(Buffer&);
+	virtual void onSend(const std::string&);
+	virtual void onReceive(std::string&);
 	virtual void onError(Error);
 	virtual void onDisconnect();
 protected:
 	HiveRef hive;
 	Socket socket;
 	Strand strand;
-	ByteString inBuffer;
+	std::string inBuffer;
 	Resolver resolver;
 	std::atomic_uint32_t errorState;
 	std::queue<Size> pendingReceives;
-	std::queue<ByteString> pendingSends;
+	std::queue<std::string> pendingSends;
 	Size inBufferSize;
 };
 
