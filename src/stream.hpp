@@ -33,11 +33,11 @@ public:
 		return std::move(s);
 	}
 
-	template <class T> T read(bool bigEndian = false)
+	template <class T> T read(bool reverseEndian = false)
 	{
 		T t;
 		internal.read(reinterpret_cast<char*>(&t), sizeof(T));
-		if (bigEndian) return boost::endian::big_to_native(t);
+		if (reverseEndian) return boost::endian::big_to_native(t);
 		return t;
 	}
 
@@ -77,14 +77,14 @@ public:
 		return internal.tellp();
 	}
 
-	template <class String> void write(const String &s)
+	template <class String> void writeString(const String &s)
 	{
 		internal.write(reinterpret_cast<const char*>(s.data()), s.size());
 	}
 
-	void write(T t, bool bigEndian = false)
+	void write(T t, bool reverseEndian = false)
 	{
-		if (bigEndian) boost::endian::big_to_native_inplace(t);
+		if (reverseEndian) boost::endian::big_to_native_inplace(t);
 		internal.write(reinterpret_cast<const char*>(&t), sizeof(T);
 	}
 
@@ -93,14 +93,14 @@ public:
 		internal.put(static_cast<char>(b));
 	}
 
-	void write16(uint16 i, bool bigEndian = false) // for ambiguity
+	void write16(uint16 i, bool reverseEndian = false) // for ambiguity
 	{
-		write(i, bigEndian);
+		write(i, reverseEndian);
 	}
 
-	void write32(uint32 i, bool bigEndian = false) // for ambiguity
+	void write32(uint32 i, bool reverseEndian = false) // for ambiguity
 	{
-		write(i, bigEndian);
+		write(i, reverseEndian);
 	}
 	
 private:
