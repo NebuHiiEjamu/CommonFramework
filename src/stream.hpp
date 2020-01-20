@@ -41,6 +41,13 @@ public:
 		return t;
 	}
 
+	template <class String> String&& readPString()
+	{
+		Byte length = read();
+		String s = read(length);
+		return std::move(s);
+	}
+
 	void seek(Size position, std::ios_base::seekdir direction = std::ios_base::cur)
 	{
 		internal.seekg(position, direction);
@@ -101,6 +108,12 @@ public:
 	void write32(uint32 i, bool reverseEndian = false) // for ambiguity
 	{
 		write(i, reverseEndian);
+	}
+
+	template <class String> void writePString(const String &s)
+	{
+		write8(s.size());
+		writeString(s);
 	}
 	
 private:
