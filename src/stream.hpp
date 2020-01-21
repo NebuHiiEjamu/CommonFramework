@@ -11,6 +11,11 @@
 class InStream
 {
 public:
+	InStream(const std::string &data)
+		internal(data)
+	{
+	}
+
 	void ignore(Size count)
 	{
 		internal.ignore(count);
