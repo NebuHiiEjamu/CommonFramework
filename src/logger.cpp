@@ -1,5 +1,5 @@
 #include <boost/predef.h>
-#include <boost/stacktrack.hpp>
+#include <boost/stacktrace.hpp>
 #include <csignal>
 #include <cstdlib>
 #include <ctime>

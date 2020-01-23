@@ -1,3 +1,5 @@
+#include "hive.hpp"
+#include "logger.hpp"
 #include "server.hpp"
 
 Server::Server():

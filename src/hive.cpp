@@ -1,5 +1,7 @@
 #include "hive.hpp"
 
+using boost::asio;
+
 Hive::Hive():
 	workGuard(asio::make_work_guard(ioContext)),
 	shutdownSignal(0)

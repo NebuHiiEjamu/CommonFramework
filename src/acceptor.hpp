@@ -7,7 +7,7 @@
 #include "forward.hpp"
 #include "typedefs.hpp"
 
-class Acceptor : public std::enable_shared_from_this<Listener>
+class Acceptor : public std::enable_shared_from_this<Acceptor>
 {
 public:
 	Acceptor(HiveRef);

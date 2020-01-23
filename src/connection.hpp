@@ -13,6 +13,7 @@ template <class T>
 class Connection : public std::enable_shared_from_this<Connection<T>>
 {
 public:
+	using Endpoint = T::endpoint;
 	using Resolver = T::resolver;
 	using Socket = T::socket;
 
@@ -29,6 +30,7 @@ public:
 	void disconnect();
 	void receive(Size);
 	void send(const std::string&);
+	void bind(const std::string_view&, uint16);
 	void connect(const std::string_view&, uint16);
 private:
 	void dispatchReceive(Size);
@@ -48,11 +50,13 @@ protected:
 	virtual void onError(Error);
 	virtual void onDisconnect();
 protected:
+	Acceptor acceptor;
 	HiveRef hive;
 	Socket socket;
 	Strand strand;
 	std::string inBuffer;
 	Resolver resolver;
+	Endpoint endpoint;
 	std::atomic_uint32_t errorState;
 	std::queue<Size> pendingReceives;
 	std::queue<std::string> pendingSends;

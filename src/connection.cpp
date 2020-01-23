@@ -188,6 +188,15 @@ void Connection<T>::send(const std::string &data)
 }
 
 template <class T>
+void Connection<T>::bind(const std::string_view &host, uint16 port)
+{
+	endpoint = Endpoint(Address::from_string(host), port);
+	socket.open(endpoint.protocol());
+	socket.set_option(T::acceptor::reuse_address(false));
+	socket.bind(endpoint);
+}
+
+template <class T>
 void Connection<T>::connect(const std::string_view &host, uint16 port)
 {
 	Resolver::iterator it = resolver.resolve(host, std::to_string(port));

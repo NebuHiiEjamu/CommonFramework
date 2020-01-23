@@ -1,7 +1,6 @@
 #ifndef _SERVER_H
 #define _SERVER_H
 
-#include <memory>
 #include "forward.hpp"
 
 class Server : public std::enable_shared_from_this<Server>
