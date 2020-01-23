@@ -3,7 +3,7 @@
 #include "connection.hpp"
 #include "hive.hpp"
 
-using boost::asio;
+namespace asio = boost::asio;
 
 template <class T>
 Connection<T>::Connection(HiveRef hive):

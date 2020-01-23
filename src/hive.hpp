@@ -18,7 +18,7 @@ public:
 	void reset();
 private:
 	boost::asio::io_context ioContext;
-	std::shared_ptr<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> workGuard;
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> workGuard;
 	std::atomic_uint32_t shutdownSignal;
 };
 

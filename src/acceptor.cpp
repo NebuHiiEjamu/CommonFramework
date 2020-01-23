@@ -4,7 +4,7 @@
 #include "connection.hpp"
 #include "hive.hpp"
 
-using boost::asio;
+namespace asio = boost::asio;
 
 Acceptor::Acceptor(HiveRef hive):
 	hive(hive),

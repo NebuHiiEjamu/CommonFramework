@@ -1,6 +1,6 @@
 #include "hive.hpp"
 
-using boost::asio;
+namespace asio = boost::asio;
 
 Hive::Hive():
 	workGuard(asio::make_work_guard(ioContext)),
@@ -51,6 +51,6 @@ void Hive::reset()
 	if (shutdownSignal.compare_exchange_strong(v1, v2))
 	{
 		ioContext.reset();
-		workGuard.reset(asio::make_work_guard(ioContext)),
+		workGuard.reset();
 	}
 }
